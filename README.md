@@ -31,6 +31,77 @@ You can include a simple diagram or bullet list if helpful.
 
 ---
 
+Real-world recommenders like Spotify and YouTube don't just find songs with the highest energy or most plays — they find songs that are closest to *what a specific user already loves*. They do this by building a profile of the user's taste (from listening history, skips, and likes) and then scoring every candidate song against that profile using a mix of behavioral signals and audio features. Our simulation prioritizes **content-based filtering**: we skip behavioral data entirely and score songs purely on how closely their audio attributes and categorical tags match a user's stated preferences. This makes the logic transparent and explainable — every recommendation can be traced back to a specific feature match — which is ideal for learning how the math behind these systems actually works.
+
+### Song Features
+
+Each `Song` object stores the following attributes drawn from `data/songs.csv`:
+
+- `id` — unique identifier
+- `title` — song name
+- `artist` — artist name
+- `genre` — categorical style label (e.g., lofi, pop, rock, ambient, jazz, synthwave, indie pop)
+- `mood` — categorical emotional tone (e.g., happy, chill, intense, relaxed, focused, moody)
+- `energy` — float 0–1, physical intensity of the track
+- `tempo_bpm` — beats per minute, normalized for scoring
+- `valence` — float 0–1, musical positiveness/brightness
+- `danceability` — float 0–1, rhythmic groove strength
+- `acousticness` — float 0–1, organic vs. electronic texture
+
+### UserProfile Features
+
+Each `UserProfile` object stores a preferred value for each scoreable feature:
+
+- `preferred_genre` — the genre the user most wants to hear
+- `preferred_mood` — the emotional tone the user is seeking
+- `preferred_energy` — target energy level (float 0–1)
+- `preferred_valence` — target valence (float 0–1)
+- `preferred_acousticness` — target acousticness (float 0–1)
+- `preferred_tempo_bpm` — target tempo (normalized before scoring)
+- `preferred_danceability` — target danceability (float 0–1)
+
+### Scoring & Ranking
+
+The `Recommender` computes a weighted proximity score for each song:
+
+- Categorical features (`genre`, `mood`) use exact/partial match scoring
+- Numerical features use `1 - |user_preference - song_value|` to reward closeness
+- Weights prioritize genre (0.30) and mood (0.25), with energy (0.20) as the top numerical signal
+- Songs are ranked by descending score; the top-N are returned as recommendations
+
+### Algorithm Recipe (Finalized)
+
+The recommender computes a score for each song by summing these weighted components. Maximum possible score is **7.25**.
+
+**Categorical matches (binary — full points or zero):**
+
+| Signal | Points | Rule |
+|--------|--------|------|
+| Genre match | +2.00 | `song.genre == user.favorite_genre` |
+| Mood match | +1.00 | `song.mood == user.favorite_mood` |
+
+**Numeric similarity (continuous — partial credit via `1 - \|difference\|`):**
+
+| Signal | Max Points | Formula |
+|--------|-----------|---------|
+| Energy | +1.50 | `1.5 × (1 - abs(song.energy - target_energy))` |
+| Valence | +1.00 | `1.0 × (1 - abs(song.valence - target_valence))` |
+| Danceability | +0.75 | `0.75 × (1 - abs(song.danceability - target_danceability))` |
+| Acousticness | +0.50 | `0.5 × (1 - abs(song.acousticness - target_acousticness))` |
+| Tempo | +0.50 | `0.5 × (1 - abs(song.tempo_bpm - target_tempo_bpm) / 120)` clamped to 0 |
+
+Genre carries the most weight because it is the primary filter users apply consciously. Energy is the strongest continuous signal because a large energy mismatch feels jarring even when genre and mood match. Valence and danceability provide secondary texture. Acousticness and tempo are tie-breakers.
+
+### Known Biases and Limitations
+
+- **Genre over-prioritization:** A +2.0 genre bonus is large enough that a genre match with poor mood and energy alignment can outscore a near-perfect mood/energy match in a different genre. Users who enjoy cross-genre listening may receive a narrower list than they would prefer.
+- **Exact string matching for categories:** `"indie pop" != "pop"`, so a user who likes pop will never receive a +2.0 bonus for an indie pop track even though many listeners enjoy both. The system cannot handle genre families or subgenres.
+- **Mood label sparsity:** The catalog only covers 14 distinct moods across 17 songs. Several moods appear only once (e.g., "nostalgic", "euphoric", "peaceful"). A user targeting a rare mood will rarely earn the +1.0 mood bonus.
+- **Small catalog ceiling:** With only 17 songs, top-K lists for K=5 include nearly a third of all available songs, which limits meaningful ranking.
+- **No behavioral signal:** The system treats all users with the same stated preferences as identical. It cannot learn that a user consistently skips high-tempo recommendations even when tempo matches their stated target.
+
+---
+
 ## Getting Started
 
 ### Setup

@@ -24,10 +24,13 @@ class UserProfile:
     Represents a user's taste preferences.
     Required by tests/test_recommender.py
     """
-    favorite_genre: str
-    favorite_mood: str
-    target_energy: float
-    likes_acoustic: bool
+    favorite_genre: str        # e.g. "lofi", "rock", "pop"
+    favorite_mood: str         # e.g. "chill", "intense", "happy"
+    target_energy: float       # 0.0 (very calm) to 1.0 (very intense)
+    target_valence: float      # 0.0 (dark/sad) to 1.0 (bright/positive)
+    target_acousticness: float # 0.0 (electronic) to 1.0 (fully acoustic)
+    target_tempo_bpm: float    # preferred beats per minute, e.g. 80.0
+    target_danceability: float # 0.0 (not danceable) to 1.0 (very danceable)
 
 class Recommender:
     """
