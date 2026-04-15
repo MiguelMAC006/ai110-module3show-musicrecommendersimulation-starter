@@ -29,14 +29,24 @@ def main() -> None:
 
     recommendations = recommend_songs(user_prefs, songs, k=5)
 
-    print("\nTop recommendations:\n")
-    for rec in recommendations:
-        # You decide the structure of each returned item.
-        # A common pattern is: (song, score, explanation)
-        song, score, explanation = rec
-        print(f"{song['title']} - Score: {score:.2f}")
-        print(f"Because: {explanation}")
-        print()
+    max_score = 7.25  # theoretical maximum from the algorithm recipe
+    sep = "-" * 52
+
+    print("\n" + "=" * 52)
+    print("  MUSIC RECOMMENDER — TOP RECOMMENDATIONS")
+    print("=" * 52)
+
+    for rank, (song, score, explanation) in enumerate(recommendations, start=1):
+        bar_filled = round((score / max_score) * 20)
+        bar = "#" * bar_filled + "." * (20 - bar_filled)
+
+        print(f"\n  #{rank}  {song['title']}  —  {song['artist']}")
+        print(f"       Genre: {song['genre']}  |  Mood: {song['mood']}")
+        print(f"       Score: {score:.2f} / {max_score:.2f}  [{bar}]")
+        print(f"       Why:")
+        for reason in explanation.split(" · "):
+            print(f"         • {reason}")
+        print(sep)
 
 
 if __name__ == "__main__":

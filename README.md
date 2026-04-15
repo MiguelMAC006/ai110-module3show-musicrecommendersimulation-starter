@@ -102,6 +102,16 @@ Genre carries the most weight because it is the primary filter users apply consc
 
 ---
 
+## Sample Output
+
+Terminal output for the default `indie pop / happy` profile:
+
+![Recommendations output — songs 1 through 3](images/Screenshot%202026-04-14%20at%2011.40.18%20PM.png)
+
+![Recommendations output — songs 4 and 5](images/Screenshot%202026-04-14%20at%2011.40.36%20PM.png)
+
+---
+
 ## Getting Started
 
 ### Setup
