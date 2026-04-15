@@ -72,23 +72,23 @@ def load_songs(csv_path: str) -> List[Dict]:
     return songs
 
 def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
-    """Return (total_score, reasons) for one song using the weighted recipe (max 7.25 pts)."""
+    """Return (total_score, reasons) for one song using the weighted recipe (max 7.75 pts)."""
     score = 0.0
     reasons: List[str] = []
 
-    # --- Categorical: genre (binary, +2.0) ---
+    # --- Categorical: genre (binary, +1.0) ---
     if song["genre"] == user_prefs.get("genre", ""):
-        score += 2.0
-        reasons.append(f"genre match ({song['genre']}) +2.0")
+        score += 1.0
+        reasons.append(f"genre match ({song['genre']}) +1.0")
 
     # --- Categorical: mood (binary, +1.0) ---
     if song["mood"] == user_prefs.get("mood", ""):
         score += 1.0
         reasons.append(f"mood match ({song['mood']}) +1.0")
 
-    # --- Numeric: energy (up to +1.5) ---
+    # --- Numeric: energy (up to +3.0) ---
     if "energy" in user_prefs:
-        pts = 1.5 * (1 - abs(song["energy"] - user_prefs["energy"]))
+        pts = 3.0 * (1 - abs(song["energy"] - user_prefs["energy"]))
         score += pts
         reasons.append(f"energy similarity +{pts:.2f}")
 

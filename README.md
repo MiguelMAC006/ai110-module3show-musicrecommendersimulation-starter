@@ -104,11 +104,59 @@ Genre carries the most weight because it is the primary filter users apply consc
 
 ## Sample Output
 
-Terminal output for the default `indie pop / happy` profile:
+The recommender is run against six profiles — three standard taste profiles and three adversarial edge-case profiles. Terminal output for each is shown below.
 
-![Recommendations output — songs 1 through 3](images/Screenshot%202026-04-14%20at%2011.40.18%20PM.png)
+---
 
-![Recommendations output — songs 4 and 5](images/Screenshot%202026-04-14%20at%2011.40.36%20PM.png)
+### Standard Profiles
+
+#### High-Energy Pop
+> Genre: pop · Mood: happy · Energy: 0.92 · Valence: 0.88 · Danceability: 0.90 · Acousticness: 0.05 · Tempo: 130 BPM
+
+![High-Energy Pop — top 5 recommendations](images/Screenshot%202026-04-14%20at%2011.50.15%20PM.png)
+
+---
+
+#### Chill Lofi
+> Genre: lofi · Mood: chill · Energy: 0.35 · Valence: 0.58 · Danceability: 0.58 · Acousticness: 0.80 · Tempo: 76 BPM
+
+![Chill Lofi — top 5 recommendations](images/Screenshot%202026-04-14%20at%2011.50.24%20PM.png)
+
+---
+
+#### Deep Intense Rock
+> Genre: rock · Mood: intense · Energy: 0.93 · Valence: 0.38 · Danceability: 0.62 · Acousticness: 0.07 · Tempo: 155 BPM
+
+![Deep Intense Rock — top 5 recommendations](images/Screenshot%202026-04-14%20at%2011.50.30%20PM.png)
+
+---
+
+### Adversarial / Edge-Case Profiles
+
+#### Conflicting — High Energy + Sad Mood
+> Genre: folk · Mood: sad · Energy: **0.90** (high-energy contradicts the sad mood) · Valence: 0.10 · Acousticness: 0.85 · Tempo: 100 BPM
+>
+> **What this tests:** The genre+mood categorical bonus (+3.0 pts combined) versus the energy numeric weight (+1.5 pts max). The sad-folk song wins despite its low energy, showing that categorical matches dominate the score.
+
+![Conflicting High Energy + Sad Mood — top 5 recommendations](images/Screenshot%202026-04-14%20at%2011.50.37%20PM.png)
+
+---
+
+#### Conflicting — Metal Genre + Max Acousticness
+> Genre: metal · Mood: aggressive · Energy: 0.97 · Valence: 0.25 · Acousticness: **0.95** (contradicts typical metal production) · Tempo: 170 BPM
+>
+> **What this tests:** Whether the genre bonus (+2.0) can survive a near-maximum acousticness penalty. Iron Curtain (acousticness 0.08) still wins handily, confirming the genre bonus outweighs the acousticness mismatch.
+
+![Conflicting Metal Genre + Max Acousticness — top 5 recommendations](images/Screenshot%202026-04-14%20at%2011.50.43%20PM.png)
+
+---
+
+#### Edge Case — All Parameters at Maximum
+> Genre: edm · Mood: euphoric · Energy: 1.0 · Valence: 1.0 · Danceability: 1.0 · Acousticness: 0.0 · Tempo: **200 BPM** (above dataset max of 168)
+>
+> **What this tests:** Saturating every axis simultaneously. The extreme tempo (200 BPM) costs the top result 0.25 pts on tempo alone. The score gap between #1 (6.76) and #2 (3.52) shows how strongly categorical bonuses dominate when a perfect genre+mood match exists.
+
+![Edge Case All Parameters at Maximum — top 5 recommendations](images/Screenshot%202026-04-14%20at%2011.50.49%20PM.png)
 
 ---
 
